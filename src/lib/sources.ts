@@ -14,7 +14,7 @@ export const DEFAULT_SOURCES: ApiSource[] = [
   {
     key: 'ffzy',
     name: '非凡资源',
-    api: 'http://cj.ffzyapi.com/api.php/provide/vod/at/json',
+    api: 'https://cj.ffzyapi.com/api.php/provide/vod/at/json',
   },
   {
     key: 'guangsu',

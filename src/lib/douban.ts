@@ -27,7 +27,6 @@ export async function fetchDoubanCategoryData(
         Accept: 'application/json, text/plain, */*',
       },
     });
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return { code: response.status, message: '请求失败', list: [] };
@@ -44,7 +43,8 @@ export async function fetchDoubanCategoryData(
 
     return { code: 200, message: '获取成功', list };
   } catch (error) {
-    clearTimeout(timeoutId);
     return { code: 500, message: '请求超时或失败', list: [] };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }

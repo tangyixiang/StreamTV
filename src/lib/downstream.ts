@@ -36,7 +36,7 @@ export function extractResolutionQuality(item: ApiSearchItem): string {
 export async function searchSingleSource(
   apiSite: ApiSource,
   query: string,
-  timeoutMs = 6000
+  timeoutMs = 5000
 ): Promise<SearchResult[]> {
   const url = `${apiSite.api}?ac=videolist&wd=${encodeURIComponent(query.trim())}`;
   const controller = new AbortController();
@@ -51,7 +51,6 @@ export async function searchSingleSource(
         Accept: 'application/json, text/plain, */*',
       },
     });
-    clearTimeout(timeoutId);
 
     if (!response.ok) return [];
 
@@ -105,8 +104,9 @@ export async function searchSingleSource(
       };
     }).filter((res: SearchResult) => res.episodes.length > 0);
   } catch (error) {
-    clearTimeout(timeoutId);
     return [];
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -116,7 +116,7 @@ export async function searchSingleSource(
 export async function fetchVideoDetail(
   apiSite: ApiSource,
   id: string,
-  timeoutMs = 6000
+  timeoutMs = 5000
 ): Promise<SearchResult | null> {
   const url = `${apiSite.api}?ac=videolist&ids=${id}`;
   const controller = new AbortController();
@@ -131,7 +131,6 @@ export async function fetchVideoDetail(
         Accept: 'application/json, text/plain, */*',
       },
     });
-    clearTimeout(timeoutId);
 
     if (!response.ok) return null;
 
@@ -184,7 +183,8 @@ export async function fetchVideoDetail(
       quality: extractResolutionQuality(item),
     };
   } catch (error) {
-    clearTimeout(timeoutId);
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
