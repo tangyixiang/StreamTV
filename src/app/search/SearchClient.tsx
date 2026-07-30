@@ -48,9 +48,8 @@ export default function SearchClient() {
             <Search className="w-6 h-6 text-blue-400" />
             <div>
               <h1 className="text-xl font-bold text-white">
-                搜索结果：<span className="text-blue-400">“{query}”</span>
+                搜索结果
               </h1>
-              <p className="text-xs text-slate-400">已聚合极速、量子、非凡、光速等高清 MacCMS 资源站结果</p>
             </div>
           </div>
           {loading && <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />}
