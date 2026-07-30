@@ -47,3 +47,27 @@ export function formatTime(seconds: number): string {
   }
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
+
+/**
+ * 安全的带超时的 fetch JSON 方法，使用 Promise.race 保证绝对不会挂起
+ */
+export async function fetchJsonWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<any> {
+  const controller = new AbortController();
+  
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => {
+      controller.abort();
+      reject(new Error(`Timeout of ${timeoutMs}ms exceeded`));
+    }, timeoutMs);
+  });
+
+  const fetchPromise = fetch(url, { ...options, signal: controller.signal }).then(async (res) => {
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    return res.json();
+  });
+
+  return Promise.race([fetchPromise, timeoutPromise]);
+}
+

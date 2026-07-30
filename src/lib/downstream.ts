@@ -1,5 +1,5 @@
 import { ApiSource, SearchResult } from './types';
-import { cleanHtmlTags } from './utils';
+import { cleanHtmlTags, fetchJsonWithTimeout } from './utils';
 
 interface ApiSearchItem {
   vod_id: string;
@@ -39,22 +39,16 @@ export async function searchSingleSource(
   timeoutMs = 5000
 ): Promise<SearchResult[]> {
   const url = `${apiSite.api}?ac=videolist&wd=${encodeURIComponent(query.trim())}`;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(url, {
-      signal: controller.signal,
+    const data = await fetchJsonWithTimeout(url, {
       headers: {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         Accept: 'application/json, text/plain, */*',
       },
-    });
+    }, timeoutMs);
 
-    if (!response.ok) return [];
-
-    const data = await response.json();
     if (!data || !data.list || !Array.isArray(data.list)) return [];
 
     return data.list.map((item: ApiSearchItem) => {
@@ -105,8 +99,6 @@ export async function searchSingleSource(
     }).filter((res: SearchResult) => res.episodes.length > 0);
   } catch (error) {
     return [];
-  } finally {
-    clearTimeout(timeoutId);
   }
 }
 
@@ -119,22 +111,16 @@ export async function fetchVideoDetail(
   timeoutMs = 5000
 ): Promise<SearchResult | null> {
   const url = `${apiSite.api}?ac=videolist&ids=${id}`;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(url, {
-      signal: controller.signal,
+    const data = await fetchJsonWithTimeout(url, {
       headers: {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         Accept: 'application/json, text/plain, */*',
       },
-    });
+    }, timeoutMs);
 
-    if (!response.ok) return null;
-
-    const data = await response.json();
     if (!data || !data.list || !Array.isArray(data.list) || data.list.length === 0) return null;
 
     const item = data.list[0];
@@ -184,7 +170,5 @@ export async function fetchVideoDetail(
     };
   } catch (error) {
     return null;
-  } finally {
-    clearTimeout(timeoutId);
   }
 }
